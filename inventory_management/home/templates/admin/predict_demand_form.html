@@ -1,0 +1,7 @@
+<h2>Predict Demand</h2>
+<form method="POST">{% csrf_token %}
+    <input name="product_name" placeholder="Product Name"><br>
+    <input name="store_name" placeholder="Store Name"><br>
+    <input type="date" name="date"><br><br>
+    <button type="submit">Predict Demand</button>
+</form>

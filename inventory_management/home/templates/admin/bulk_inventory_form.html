@@ -1,0 +1,8 @@
+<h2>Bulk Inventory Add</h2>
+<form method="POST">{% csrf_token %}
+<textarea name="items" rows="10" cols="60" placeholder='[
+    {"product_name": "Laptop", "store_name": "Store 1", "quantity": 10},
+    {"product_name": "Mouse", "store_name": "Store 2", "quantity": 5}
+]'></textarea><br>
+<button type="submit">Submit</button>
+</form>

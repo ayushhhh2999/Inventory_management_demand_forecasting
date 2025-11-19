@@ -1,0 +1,7 @@
+<h2>Add Inventory</h2>
+<form method="POST">{% csrf_token %}
+    <input name="product_name" placeholder="Product Name"><br>
+    <input name="store_name" placeholder="Store Name"><br>
+    <input type="number" name="quantity" placeholder="Quantity"><br><br>
+    <button type="submit">Add Inventory</button>
+</form>
