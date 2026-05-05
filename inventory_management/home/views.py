@@ -512,8 +512,11 @@ def create_features_from_sale(store_id, product_id, date, quantity):
     """
     Create X, y rows exactly like original training DataFrame.
     """
-
     date_obj = datetime.strptime(date, "%Y-%m-%d")
+
+    # Build holiday key exactly as in your training phase
+    holiday_key = f"{date_obj.day}-{date_obj.month}"
+    is_holiday = 1 if india_holidays.get(holiday_key, False) else 0
 
     df = pd.DataFrame([{
         "store": store_id,
@@ -521,7 +524,7 @@ def create_features_from_sale(store_id, product_id, date, quantity):
         "month": date_obj.month,
         "day": date_obj.day,
         "weekend": 1 if date_obj.weekday() >= 5 else 0,
-        "holidays": 0,   # <-- FIX: must match original training exactly
+        "holidays": is_holiday,
         "m1": np.sin(date_obj.month * (2 * np.pi / 12)),
         "m2": np.cos(date_obj.month * (2 * np.pi / 12)),
         "weekday": date_obj.weekday(),
