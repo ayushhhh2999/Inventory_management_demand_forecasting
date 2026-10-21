@@ -22,13 +22,22 @@ def load_documents(file_path=PERSISTED_DOCS_FILE):
     if not os.path.exists(file_path):
         return []
 
-    with open(file_path, "rb") as f:
-        serialized = pickle.load(f)
+    try:
+        with open(file_path, "rb") as f:
+            serialized = pickle.load(f)
+    except (OSError, pickle.UnpicklingError, EOFError):
+        return []
 
-    return [
-        Document(page_content=item["page_content"], metadata=item.get("metadata", {}))
-        for item in serialized
-    ]
+    documents = []
+    for item in serialized:
+        if not isinstance(item, dict):
+            continue
+        page_content = item.get("page_content")
+        if page_content is None:
+            continue
+        documents.append(Document(page_content=page_content, metadata=item.get("metadata", {})))
+
+    return documents
 
 
 def create_vector_store(embeddings, documents):
@@ -66,6 +75,22 @@ def add_documents_to_vector_store(vector_store, embeddings, documents):
 
 def list_persisted_documents():
     return load_documents()
+
+
+def delete_documents_by_ids(ids, file_path=PERSISTED_DOCS_FILE):
+    documents = load_documents(file_path)
+    if not documents:
+        return []
+
+    ids_to_delete = {idx for idx in ids if isinstance(idx, int) and 1 <= idx <= len(documents)}
+    if not ids_to_delete:
+        return documents
+
+    remaining_documents = [
+        doc for idx, doc in enumerate(documents, start=1) if idx not in ids_to_delete
+    ]
+    save_documents(remaining_documents, file_path)
+    return remaining_documents
 
 
 def clear_persisted_documents(file_path=PERSISTED_DOCS_FILE):

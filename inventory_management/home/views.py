@@ -561,3 +561,28 @@ def retrain_model_with_new_sale(store_id, product_id, date, quantity):
     # Save updated model
     model.save_model(MODEL_PATH)
     print("Model retrained with new sale data.")
+
+@api_view(['GET'])
+def dashboard_summary(request):
+    total_stores = Store.objects.count()
+    total_products = Product.objects.count()
+    total_inventory = Inventory.objects.count()
+    total_sales = Sale.objects.count()
+
+    recent_sales = Sale.objects.order_by("-date")[:5]
+
+    return Response({
+        "total_stores": total_stores,
+        "total_products": total_products,
+        "total_inventory": total_inventory,
+        "total_sales": total_sales,
+        "recent_sales": [
+            {
+                "product": s.product.name,
+                "store": s.store.name,
+                "date": s.date,
+                "quantity": s.quantity_sold
+            }
+            for s in recent_sales
+        ]
+    })

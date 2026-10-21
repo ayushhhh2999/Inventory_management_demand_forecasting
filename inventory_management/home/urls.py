@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     StoreViewSet, ProductViewSet, InventoryViewSet,
-    SaleViewSet, PurchaseViewSet,
+    SaleViewSet, PurchaseViewSet, dashboard_summary,
     remove_store, remove_product, bulk_create_products,add_sale,
     bulk_create_stores,predict_demand,get_inventory,get_sales
 )
@@ -24,7 +24,7 @@ urlpatterns = [
     path('api/predict-demand/', predict_demand),
     path("api/inventory/view/", get_inventory),
     path("api/sales/view/", get_sales),
-
+    path('api/dashboard/', dashboard_summary),
     # ✅ router routes LAST
     path('api/', include(router.urls)),
 ]

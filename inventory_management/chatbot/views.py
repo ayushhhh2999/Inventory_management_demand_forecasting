@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Body
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
@@ -10,6 +10,7 @@ from vector_store import (
     add_documents_to_vector_store,
     load_vector_store,
     list_persisted_documents,
+    delete_documents_by_ids,
     clear_persisted_documents,
 )
 from chat_model import get_chat_model, chat_model_invoke
@@ -172,11 +173,20 @@ def list_chunks():
 
 
 @app.delete("/chunks")
-def delete_chunks():
-    clear_persisted_documents()
-
+def delete_chunks(ids: list[int] = Body(default=None, embed=True)):
     global GLOBAL_VECTOR_STORE
     embeddings = get_embeddings()
+
+    if ids is None:
+        clear_persisted_documents()
+        GLOBAL_VECTOR_STORE = load_vector_store(embeddings)
+        return {"message": "All chunks deleted"}
+
+    remaining_docs = delete_documents_by_ids(ids)
     GLOBAL_VECTOR_STORE = load_vector_store(embeddings)
 
-    return {"message": "All chunks deleted"}
+    return {
+        "message": "Selected chunks deleted",
+        "deleted_ids": ids,
+        "remaining_count": len(remaining_docs),
+    }
